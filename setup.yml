@@ -1,0 +1,26 @@
+- hosts: master
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: Install docker
+    dnf:
+      name: docker
+      state: latest
+  - shell: |
+      echo "
+      [kubernetes]
+      name=Kubernetes
+      baseurl=http://yum.kubernetes.io/repos/kubernetes-el7-x86_64
+      enabled=1
+      gpgcheck=1
+      repo_gpgcheck=1
+      gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+             https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg" \
+      > /etc/yum.repos.d/kubernetes.repo
+  - name: Install kubernetes
+    dnf: name={{ item }} state=latest
+    with_items:
+      - kubelet
+      - kubeadm
+      - kubectl
+      - kubernetes-cni
