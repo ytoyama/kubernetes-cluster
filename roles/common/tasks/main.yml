@@ -2,9 +2,11 @@
   dnf:
     name: docker
     state: latest
+
 - copy:
     src: kubernetes.repo
     dest: /etc/yum.repos.d/kubernetes.repo
+
 - name: Install kubernetes
   dnf: name={{ item }} state=latest
   with_items:
@@ -12,3 +14,13 @@
     - kubeadm
     - kubectl
     - kubernetes-cni
+
+- systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- systemd:
+    name: kubelet
+    state: started
+    enabled: yes
