@@ -11,4 +11,7 @@ main :: IO ()
 main = shakeArgs shakeOptions $ do
   "ping" ~> cmd "ansible all -i" hostsFile "-m ping"
   "setup" ~> do
-    cmd "ansible-playbook --ask-become-pass -i" hostsFile "setup.yml"
+    cmd "ansible-playbook --ask-vault-pass --ask-become-pass -i" hostsFile
+        "setup.yml"
+  "clean" ~> do
+    cmd Shell "rm -f *.retry"

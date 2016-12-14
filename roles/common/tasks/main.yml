@@ -3,9 +3,29 @@
     name: docker
     state: latest
 
+- systemd:
+    name: docker
+    state: started
+    enabled: yes
+
 - copy:
     src: kubernetes.repo
     dest: /etc/yum.repos.d/kubernetes.repo
+
+- copy:
+    src: kubernetes.token
+    dest: /etc/kubernetes/token
+    mode: "u=r,g=,o="
+
+- command: setenforce 0
+
+- name: Install kubernetes
+  dnf: name={{ item }} state=absent
+  with_items:
+    - kubelet
+    - kubeadm
+    - kubectl
+    - kubernetes-cni
 
 - name: Install kubernetes
   dnf: name={{ item }} state=latest
@@ -15,10 +35,8 @@
     - kubectl
     - kubernetes-cni
 
-- systemd:
-    name: docker
-    state: started
-    enabled: yes
+- shell: killall kubeadm || true
+- shell: kubeadm reset
 
 - systemd:
     name: kubelet
